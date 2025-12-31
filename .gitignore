@@ -1,0 +1,37 @@
+__pycache__/
+*.pyc
+.env
+.DS_Store
+.vscode/
+.idea/
+node_modules/
+dist/
+build/
+*.log
+coverage/
+*.sqlite3
+*.db
+*.bak
+*.swp
+
+
+# Ignore system files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+*.lnk
+
+    //add all that shouldnot be in git
+venv/
+.env/
+*.egg-info/
+.mypy_cache/
+.pytest_cache/
+htmlcov/
+.tox/
+.ipynb_checkpoints/
+.cache/
+*.pot
+
+
+
