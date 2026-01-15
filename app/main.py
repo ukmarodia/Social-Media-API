@@ -5,7 +5,20 @@ from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
+
+from app import models
+from .database import SessionLocal, engine
+models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 class Post(BaseModel):
     title: str 
@@ -24,18 +37,9 @@ while True:
         time.sleep(2)
 
 
-my_posts = [{"title":"title of post1", "content":"content of post1", "id": 1},{"title": "Favourite foods", "content":"I like pizza", "id":2}]
 
-def find_post(id):
-    for p in my_posts:
-        if p["id"] == id:
-            return p
-        
 
-def find_index_post(id):
-    for i, p in enumerate(my_posts):
-        if p['id'] ==id:
-            return i
+
 
 @app.get("/")
 async def root():
