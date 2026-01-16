@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from fastapi import Body, FastAPI, Response, status, HTTPException, Depends
 from pydantic import BaseModel
 from random import randrange
@@ -40,16 +40,16 @@ while True:
 async def root():
     return {"message": "Hello WOrld"}
 
-@app.get("/posts")
+@app.get("/posts", response_model = List[schema.Post])
 def get_post(db: Session = Depends(get_db)):
     # cursor.execute("""SELECT * FROM posts """)
     # posts = cursor.fetchall()
 
     posts = db.query(models.Post).all()
     
-    return {"Data": posts}
+    return  posts
 
-@app.post("/posts", status_code = status.HTTP_201_CREATED)
+@app.post("/posts", status_code = status.HTTP_201_CREATED, response_model= schema.Post)
 def create_post(new_post: schema.PostCreate, db: Session = Depends(get_db)):
     # cursor.execute("""INSERT INTO posts (title, content, published) VALUES (%s,%s,%s) RETURNING * """,(new_post.title, new_post.content, new_post.published))
     # mpost = cursor.fetchone()
@@ -59,12 +59,12 @@ def create_post(new_post: schema.PostCreate, db: Session = Depends(get_db)):
     db.add(mpost)
     db.commit()
     db.refresh(mpost)
-    return {"data": mpost}
+    return mpost
 
 
 
 
-@app.get("/posts/{id}")
+@app.get("/posts/{id}", response_model=schema.Post)
 def get_post(id: int, db: Session = Depends(get_db)):
     # cursor.execute("""SELECT * FROM posts WHERE id = %s""",(str(id))) 
     # post = cursor.fetchone()
@@ -73,7 +73,7 @@ def get_post(id: int, db: Session = Depends(get_db)):
         # response.status_code = status.HTTP_404_NOT_FOUND
         # return {"detail": "Post not found"}
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"post with id: {id} was not found")
-    return {"post_detail":post}
+    return post
 
 @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int, db: Session = Depends(get_db)):
@@ -88,7 +88,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
     
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-@app.put("/posts/{id}")
+@app.put("/posts/{id}", response_model=schema.Post)
 def update_post(id: int, post: schema.PostCreate, db: Session = Depends(get_db)):
     # cursor.execute("""UPDATE posts SET title = %s, content = %s, published = %s WHERE id = %s RETURNING *""",(post.title, post.content, post.published,(str(id))))
     # update = cursor.fetchone()
@@ -106,5 +106,5 @@ def update_post(id: int, post: schema.PostCreate, db: Session = Depends(get_db))
     
      
     
-    return {"data": post_query.first()}
+    return  post_query.first()
     
