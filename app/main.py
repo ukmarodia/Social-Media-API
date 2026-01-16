@@ -53,10 +53,15 @@ def get_post(db: Session = Depends(get_db)):
     return {"Data": posts}
 
 @app.post("/posts", status_code = status.HTTP_201_CREATED)
-def create_post(new_post: Post):
-    cursor.execute("""INSERT INTO posts (title, content, published) VALUES (%s,%s,%s) RETURNING * """,(new_post.title, new_post.content, new_post.published))
-    mpost = cursor.fetchone()
-    conn.commit()
+def create_post(new_post: Post, db: Session = Depends(get_db)):
+    # cursor.execute("""INSERT INTO posts (title, content, published) VALUES (%s,%s,%s) RETURNING * """,(new_post.title, new_post.content, new_post.published))
+    # mpost = cursor.fetchone()
+    # conn.commit()
+    
+    mpost =models.Post(**new_post.dict())
+    db.add(mpost)
+    db.commit()
+    db.refresh(mpost)
     return {"data": mpost}
 
 @app.get("/posts/latest")
