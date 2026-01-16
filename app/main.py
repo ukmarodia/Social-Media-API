@@ -64,18 +64,14 @@ def create_post(new_post: Post, db: Session = Depends(get_db)):
     db.refresh(mpost)
     return {"data": mpost}
 
-@app.get("/posts/latest")
-def get_latest_post():
-    
-    post = my_posts[len(my_posts)-1]
-    
-    return {"detail": post}
+
 
 
 @app.get("/posts/{id}")
-def get_post(id: int):
-    cursor.execute("""SELECT * FROM posts WHERE id = %s""",(str(id))) 
-    post = cursor.fetchone()
+def get_post(id: int, db: Session = Depends(get_db)):
+    # cursor.execute("""SELECT * FROM posts WHERE id = %s""",(str(id))) 
+    # post = cursor.fetchone()
+    post = db.query(models.Post).filter(models.Post.id== id).first()
     if not post:
         # response.status_code = status.HTTP_404_NOT_FOUND
         # return {"detail": "Post not found"}
