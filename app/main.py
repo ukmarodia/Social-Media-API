@@ -7,10 +7,13 @@ from psycopg2.extras import RealDictCursor
 import time
 from sqlalchemy.orm import Session
 from . import schema
-from app import models
+from app import models, utils
 
 
 from app.database import  engine, get_db
+
+
+
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
@@ -111,9 +114,14 @@ def update_post(id: int, post: schema.PostCreate, db: Session = Depends(get_db))
 
 @app.post("/users", status_code=status.HTTP_201_CREATED, response_model= schema.UserOut)
 def create_user(user: schema.UserCreate,db: Session = Depends(get_db)):
-   new_user = models.User(**user.dict())
-   db.add(new_user)
-   db.commit()
-   db.refresh(new_user)
+   
+    # hash the password
+    hashed_password = utils.hash(user.password)
+    user.password = hashed_password
 
-   return new_user
+    new_user = models.User(**user.dict())
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return new_user
