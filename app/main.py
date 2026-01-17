@@ -8,7 +8,7 @@ import time
 from sqlalchemy.orm import Session
 from . import schema
 from app import models, utils
-from .routers import post, user 
+from .routers import post, user , auth
 
 from app.database import  engine, get_db
 
@@ -37,6 +37,7 @@ app = FastAPI()
 
 app.include_router(post.router)
 app.include_router(user.router)
+app.include_router(auth.router)
 
 
 
